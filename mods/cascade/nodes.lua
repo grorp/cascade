@@ -18,5 +18,7 @@ minetest.register_node("cascade:invisible", {
     drawtype = "airlike",
     paramtype = "light",
     sunlight_propagates = true,
+
     pointable = false,
+    walkable = true,
 })

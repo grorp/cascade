@@ -1,5 +1,5 @@
 minetest.register_globalstep(function()
-    minetest.set_timeofday(0.5)
+    minetest.set_timeofday(0.4) -- Results in nice shadows.
 end)
 
 minetest.register_on_joinplayer(function(player)
