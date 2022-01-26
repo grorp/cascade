@@ -66,8 +66,8 @@ local function write_maze(min_pos, max_pos, parts)
     end
 
     if parts.floor then
-        local id_floor = minetest.get_content_id("escape:floor")
-        local id_floor_broken = minetest.get_content_id("escape:floor_broken")
+        local id_floor = minetest.get_content_id("cascade:floor")
+        local id_floor_broken = minetest.get_content_id("cascade:floor_broken")
 
         local function floor(x, y, z)
             vmanip_data_new[vmanip_area:index(x, y, z)] = (
@@ -90,9 +90,9 @@ local function write_maze(min_pos, max_pos, parts)
             {x = (max_pos.x - min_pos.x - 4) / 4, y = (max_pos.z - min_pos.z - 4) / 4}
         )
 
-        local id_wall = minetest.get_content_id("escape:wall")
-        local id_wall_broken = minetest.get_content_id("escape:wall_broken")
-        local id_invisible = minetest.get_content_id("escape:invisible")
+        local id_wall = minetest.get_content_id("cascade:wall")
+        local id_wall_broken = minetest.get_content_id("cascade:wall_broken")
+        local id_invisible = minetest.get_content_id("cascade:invisible")
 
         local function wall(x, y, z)
             local id
