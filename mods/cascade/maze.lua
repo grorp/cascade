@@ -1,3 +1,30 @@
+minetest.register_node("cascade:floor", {
+    tiles = {"cascade_floor.png"},
+    pointable = false,
+})
+
+minetest.register_node("cascade:floor_broken", {
+    tiles = {"cascade_floor_broken.png"},
+    pointable = false,
+})
+
+minetest.register_node("cascade:wall", {
+    tiles = {"cascade_wall.png"},
+    pointable = false,
+})
+
+minetest.register_node("cascade:wall_broken", {
+    tiles = {"cascade_wall_broken.png"},
+    pointable = false,
+})
+
+minetest.register_node("cascade:wall_invisible", {
+    drawtype = "airlike",
+    paramtype = "light",
+    sunlight_propagates = true,
+    pointable = false,
+})
+
 -- See https://weblog.jamisbuck.org/2011/1/17/maze-generation-aldous-broder-algorithm.
 local function generate_maze(min_cell, max_cell)
     local maze = {}
@@ -92,7 +119,7 @@ local function write_maze(min_pos, max_pos, parts)
 
         local id_wall = minetest.get_content_id("cascade:wall")
         local id_wall_broken = minetest.get_content_id("cascade:wall_broken")
-        local id_invisible = minetest.get_content_id("cascade:invisible")
+        local id_wall_invisible = minetest.get_content_id("cascade:wall_invisible")
 
         local function wall(x, y, z)
             local id
@@ -103,7 +130,7 @@ local function write_maze(min_pos, max_pos, parts)
                     id_wall_broken
                 )
             else
-                id = id_invisible
+                id = id_wall_invisible
             end
             vmanip_data_new[vmanip_area:index(x, y, z)] = id
         end
@@ -187,15 +214,23 @@ local storage = minetest.get_mod_storage()
 if storage:get_int("generated") == 0 then
     minetest.after(0, function()
         local pos = vector.new(0, 111, 0)
-        for size = 1, 16 do
+
+        for index = 1, 18 do
+            local size = (
+                (index == 1 and 1) or
+                (index == 17 and 16) or
+                (index == 18 and 1) or
+                index
+            )
             write_maze(
                 pos,
                 pos + vector.new(size * 4, 15, size * 4),
                 {
                     floor = true,
-                    walls = not (size == 1 or size == 16),
+                    walls = not (index == 1 or index == 17 or index == 18),
                 }
             )
+
             pos = pos + vector.new(size * 4, -12, size * 4)
         end
     end)
