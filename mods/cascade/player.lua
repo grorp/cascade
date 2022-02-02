@@ -1,5 +1,5 @@
 minetest.register_globalstep(function()
-    minetest.set_timeofday(0.5)
+    minetest.set_timeofday(0.4)
 end)
 
 minetest.register_on_joinplayer(function(player)
@@ -46,7 +46,6 @@ minetest.register_on_joinplayer(function(player)
 
         -- https://github.com/minetest/minetest/blob/163d3547e65a6cea8a3e555557407e88d8e09183/doc/lua_api.txt#L7290
         nametag_color = "#00000000",
-
     })
 
     player:set_armor_groups({
