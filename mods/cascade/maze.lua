@@ -81,7 +81,7 @@ local function generate_maze(min_cell, max_cell)
     return maze
 end
 
-local function write_maze(min_pos, max_pos, parts)
+local function write_maze(min_pos, max_pos, walls)
     local vmanip = VoxelManip()
     local vmanip_min_pos, vmanip_max_pos = vmanip:read_from_map(min_pos, max_pos)
     local vmanip_area = VoxelArea:new({MinEdge = vmanip_min_pos, MaxEdge = vmanip_max_pos})
@@ -92,26 +92,24 @@ local function write_maze(min_pos, max_pos, parts)
         vmanip_data_new[index] = vmanip_data[index]
     end
 
-    if parts.floor then
-        local id_floor = minetest.get_content_id("cascade:floor")
-        local id_floor_broken = minetest.get_content_id("cascade:floor_broken")
+    local id_floor = minetest.get_content_id("cascade:floor")
+    local id_floor_broken = minetest.get_content_id("cascade:floor_broken")
 
-        local function floor(x, y, z)
-            vmanip_data_new[vmanip_area:index(x, y, z)] = (
-                math.random() < 0.9 and
-                id_floor or
-                id_floor_broken
-            )
-        end
+    local function floor(x, y, z)
+        vmanip_data_new[vmanip_area:index(x, y, z)] = (
+            math.random() < 0.9 and
+            id_floor or
+            id_floor_broken
+        )
+    end
 
-        for x = min_pos.x, max_pos.x do
-            for z = min_pos.z, max_pos.z do
-                floor(x, min_pos.y, z)
-            end
+    for x = min_pos.x, max_pos.x do
+        for z = min_pos.z, max_pos.z do
+            floor(x, min_pos.y, z)
         end
     end
 
-    if parts.walls then
+    if walls then
         local maze = generate_maze(
             {x = 0, y = 0},
             {x = (max_pos.x - min_pos.x - 4) / 4, y = (max_pos.z - min_pos.z - 4) / 4}
@@ -214,26 +212,43 @@ local storage = minetest.get_mod_storage()
 if storage:get_int("generated") == 0 then
     minetest.after(0, function()
         local pos = vector.new(0, 111, 0)
+        local checkpoints = {}
 
         for index = 1, 18 do
-            local size = (
-                (index == 1 and 1) or
-                (index == 17 and 16) or
-                (index == 18 and 1) or
-                index
-            )
+            local size
+            local walls
+
+            if index == 1 then
+                size = 1
+                walls = false
+            end
+            if index >= 2 and index <= 16 then
+                size = index
+                walls = true
+            end
+            if index == 17 then
+                size = 16
+                walls = false
+            end
+            if index == 18 then
+                size = 1
+                walls = false
+            end
+
+            local min_pos = pos
+            local max_pos = pos + vector.new(size * 4, 15, size * 4)
+
             write_maze(
-                pos,
-                pos + vector.new(size * 4, 15, size * 4),
-                {
-                    floor = true,
-                    walls = not (index == 1 or index == 17 or index == 18),
-                }
+                min_pos,
+                max_pos,
+                walls
             )
 
             pos = pos + vector.new(size * 4, -12, size * 4)
+            checkpoints[#checkpoints + 1] = vector.new(max_pos.x - (4 / 2), min_pos.y + 1, max_pos.z - (4 / 2))
         end
-    end)
 
-    storage:set_int("generated", 1)
+        storage:set_string("checkpoints", minetest.serialize(checkpoints))
+        storage:set_int("generated", 1)
+    end)
 end
