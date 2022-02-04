@@ -211,8 +211,9 @@ local storage = minetest.get_mod_storage()
 
 if storage:get_int("generated") == 0 then
     minetest.after(0, function()
-        local pos = vector.new(0, 111, 0)
         local checkpoints = {}
+
+        local pos = vector.new(0, 111, 0)
 
         for index = 1, 18 do
             local size
@@ -243,9 +244,9 @@ if storage:get_int("generated") == 0 then
                 max_pos,
                 walls
             )
+            checkpoints[#checkpoints + 1] = vector.new(max_pos.x - (4 / 2), min_pos.y + 1, max_pos.z - (4 / 2))
 
             pos = pos + vector.new(size * 4, -12, size * 4)
-            checkpoints[#checkpoints + 1] = vector.new(max_pos.x - (4 / 2), min_pos.y + 1, max_pos.z - (4 / 2))
         end
 
         storage:set_string("checkpoints", minetest.serialize(checkpoints))
