@@ -42,22 +42,9 @@ local function fail(player)
             "label[0.5, 0.625;" .. f(t("You have failed.")) .. "]" ..
             "button_exit[0.5,1.25;4,0.5;;" .. f(t("Try again")) .. "]"
         )
-
         meta:set_int("failed", 1)
     end
 end
-
-minetest.register_on_player_receive_fields(function(player, formspec_name, formspec_fields)
-    local meta = player:get_meta()
-
-    if meta:get_int("failed") == 1 then
-        if formspec_name == "cascade:fail" and formspec_fields.quit then
-            place(player)
-
-            meta:set_int("failed", 0)
-        end
-    end
-end)
 
 local function win()
     if cascade.storage:get_int("won") == 0 then
@@ -73,14 +60,22 @@ local function win()
                 "button_exit[0.5,1.25;4,0.5;;" .. f(t("Bye...")) .. "]"
             )
         end
-
         cascade.storage:set_int("won", 1)
     end
 end
 
 minetest.register_on_player_receive_fields(function(player, formspec_name, formspec_fields)
-    if cascade.storage:get_int("won") == 1 then
-        if formspec_name == "cascade:win" and formspec_fields.quit then
+    if formspec_name == "cascade:fail" and formspec_fields.quit then
+        local meta = player:get_meta()
+
+        if meta:get_int("failed") == 1 then
+            place(player)
+            meta:set_int("failed", 0)
+        end
+    end
+
+    if formspec_name == "cascade:win" and formspec_fields.quit then
+        if cascade.storage:get_int("won") == 1 then
             minetest.disconnect_player(player:get_player_name(), t("N/A."))
         end
     end
