@@ -207,9 +207,7 @@ local function write_maze(min_pos, max_pos, walls)
     vmanip:write_to_map()
 end
 
-local storage = minetest.get_mod_storage()
-
-if storage:get_int("generated") == 0 then
+if cascade.storage:get_int("generated") == 0 then
     minetest.after(0, function()
         local checkpoints = {}
 
@@ -249,7 +247,7 @@ if storage:get_int("generated") == 0 then
             pos = pos + vector.new(size * 4, -12, size * 4)
         end
 
-        storage:set_string("checkpoints", minetest.serialize(checkpoints))
-        storage:set_int("generated", 1)
+        cascade.storage:set_string("checkpoints", minetest.serialize(checkpoints))
+        cascade.storage:set_int("generated", 1)
     end)
 end
