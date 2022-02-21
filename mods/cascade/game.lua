@@ -109,7 +109,7 @@ minetest.register_globalstep(function()
                 do_win = false
             end
 
-            if player:get_pos().y < -200 then
+            if player:get_pos().y < -100 then
                 fail(player)
             end
         end

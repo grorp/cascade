@@ -211,28 +211,24 @@ if cascade.storage:get_int("generated") == 0 then
     minetest.after(0, function()
         local checkpoints = {}
 
-        local pos = vector.new(0, 111, 0)
+        local pos = vector.new(0, 100, 0)
 
-        for index = 1, 18 do
-            local size
-            local walls
+        local mazes = {
+            {1, false},
 
-            if index == 1 then
-                size = 1
-                walls = false
-            end
-            if index >= 2 and index <= 16 then
-                size = index
-                walls = true
-            end
-            if index == 17 then
-                size = 16
-                walls = false
-            end
-            if index == 18 then
-                size = 1
-                walls = false
-            end
+            {5, true},
+            {10, true},
+            {15, true},
+            {20, true},
+            {25, true},
+
+            {10, false},
+
+            {1, false},
+        }
+
+        for _, maze in pairs(mazes) do
+            local size, walls = maze[1], maze[2]
 
             local min_pos = pos
             local max_pos = pos + vector.new(size * 4, 15, size * 4)

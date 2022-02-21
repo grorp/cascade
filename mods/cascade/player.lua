@@ -12,11 +12,11 @@ minetest.register_on_joinplayer(function(player)
 
     player:set_clouds({
         color = "#dff6f5",
-        density = 0.5,
 
-        height = 100,
-        thickness = 10,
-        speed = vector.new(0, 0, 10),
+        height = 91.5,
+        thickness = 8,
+        speed = vector.new(1.414213562373095, 0, 1.414213562373095),
+        density = 0.5,
     })
 
     player:set_sun({
