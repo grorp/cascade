@@ -1,3 +1,5 @@
+local shared = ...
+
 minetest.register_globalstep(function()
     minetest.set_timeofday(0.4)
 end)

@@ -1,3 +1,5 @@
+local shared = ...
+
 minetest.register_node("cascade:floor", {
     tiles = {"cascade_floor.png"},
     pointable = false,
@@ -207,7 +209,7 @@ local function write_maze(min_pos, max_pos, walls)
     vmanip:write_to_map()
 end
 
-if cascade.storage:get_int("generated") == 0 then
+if shared.storage:get_int("generated") == 0 then
     minetest.after(0, function()
         local checkpoints = {}
 
@@ -243,7 +245,7 @@ if cascade.storage:get_int("generated") == 0 then
             pos = pos + vector.new(size * 4, -12, size * 4)
         end
 
-        cascade.storage:set_string("checkpoints", minetest.serialize(checkpoints))
-        cascade.storage:set_int("generated", 1)
+        shared.storage:set_string("checkpoints", minetest.serialize(checkpoints))
+        shared.storage:set_int("generated", 1)
     end)
 end

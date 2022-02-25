@@ -1,10 +1,12 @@
+local shared = ...
+
 local t = minetest.get_translator("cascade")
 local f = minetest.formspec_escape
 
 local checkpoints_cached
 local checkpoints = function()
     if not checkpoints_cached then
-        checkpoints_cached = minetest.deserialize(cascade.storage:get_string("checkpoints"))
+        checkpoints_cached = minetest.deserialize(shared.storage:get_string("checkpoints"))
     end
     return checkpoints_cached
 end
@@ -47,7 +49,7 @@ local function fail(player)
 end
 
 local function win()
-    if cascade.storage:get_int("won") == 0 then
+    if shared.storage:get_int("won") == 0 then
         local players = minetest.get_connected_players()
 
         for _, player in pairs(players) do
@@ -60,7 +62,7 @@ local function win()
                 "button_exit[0.5,1.25;4,0.5;;" .. f(t("Bye...")) .. "]"
             )
         end
-        cascade.storage:set_int("won", 1)
+        shared.storage:set_int("won", 1)
     end
 end
 
@@ -75,14 +77,14 @@ minetest.register_on_player_receive_fields(function(player, formspec_name, forms
     end
 
     if formspec_name == "cascade:win" and formspec_fields.quit then
-        if cascade.storage:get_int("won") == 1 then
+        if shared.storage:get_int("won") == 1 then
             minetest.disconnect_player(player:get_player_name(), t("N/A."))
         end
     end
 end)
 
 minetest.register_on_joinplayer(function(player)
-    if cascade.storage:get_int("won") == 1 then
+    if shared.storage:get_int("won") == 1 then
         minetest.disconnect_player(player:get_player_name(), t("N/A."))
     end
 end)
