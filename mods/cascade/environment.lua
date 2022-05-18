@@ -1,5 +1,5 @@
 minetest.register_on_joinplayer(function(player)
-    player:override_day_night_ratio(0.95)
+    player:override_day_night_ratio(1)
 
     player:set_sky({
         type = "plain",
