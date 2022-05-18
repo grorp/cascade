@@ -37,7 +37,6 @@ minetest.register_on_joinplayer(function(player)
     player:set_inventory_formspec("")
 end)
 
-
 minetest.chat_send_all = function() end
 minetest.chat_send_player = function() end
 
