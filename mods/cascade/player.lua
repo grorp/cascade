@@ -1,37 +1,6 @@
 local shared = ...
 
-minetest.register_globalstep(function()
-    minetest.set_timeofday(0.4)
-end)
-
 minetest.register_on_joinplayer(function(player)
-    player:set_sky({
-        type = "plain",
-        base_color = "#cd6093",
-
-        clouds = true,
-    })
-
-    player:set_clouds({
-        color = "#dff6f5",
-
-        height = 91.5,
-        thickness = 8,
-        speed = vector.new(1.414213562373095, 0, 1.414213562373095),
-        density = 0.5,
-    })
-
-    player:set_sun({
-        visible = false,
-        sunrise_visible = false,
-    })
-    player:set_moon({
-        visible = false,
-    })
-    player:set_stars({
-        visible = false,
-    })
-
     player:set_properties({
         visual = "cube",
         visual_size = vector.new(0.75, 1.75, 0.75),
