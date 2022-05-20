@@ -13,8 +13,7 @@ local function get_checkpoint(player)
 end
 
 local function place(player)
-    local box = player:get_properties().collisionbox
-    player:set_pos(get_checkpoint(player) - vector.new(0, 0.5 + box[2], 0))
+    player:set_pos(get_checkpoint(player) + vector.new(0, -0.5 + 0.9375, 0))
     player:set_look_vertical(0)
     player:set_look_horizontal(vector.dir_to_rotation(vector.new(1, 0, 1):normalize()).y)
 end
@@ -29,20 +28,34 @@ local function fail(player)
     place(player)
 end
 
+local function win(player)
+    local done_players = minetest.deserialize(shared.storage:get_string("done_players")) or {}
+    done_players[player:get_player_name()] = true
+    shared.storage:set_string("done_players", minetest.serialize(done_players))
+
+    minetest.disconnect_player(player:get_player_name(), t("N/A."))
+end
+
+minetest.register_on_prejoinplayer(function(player_name)
+    local done_players = minetest.deserialize(shared.storage:get_string("done_players")) or {}
+    if done_players[player_name] then
+        return t("N/A.")
+    end
+end)
+
 minetest.register_globalstep(function()
     local players = minetest.get_connected_players()
     local checkpoints = shared.checkpoints
 
     for _, player in ipairs(players) do
-        local p_pos = player:get_pos()
-        local p_box = player:get_properties().collisionbox
+        local pos = player:get_pos()
 
         local a = {
-            min = {x = p_pos.x + p_box[1], y = p_pos.y + p_box[2], z = p_pos.z + p_box[3]},
-            max = {x = p_pos.x + p_box[4], y = p_pos.y + p_box[5], z = p_pos.z + p_box[6]},
+            min = {x = pos.x - 0.4375, y = pos.y - 0.9375, z = pos.z - 0.4375},
+            max = {x = pos.x + 0.4375, y = pos.y + 0.9375, z = pos.z + 0.4375},
         }
 
-        for _, checkpoint in ipairs(checkpoints) do
+        for index, checkpoint in ipairs(checkpoints) do
             local b = {
                 min = {x = checkpoint.x - 2.5, y = checkpoint.y - 1.5, z = checkpoint.z - 2.5},
                 max = {x = checkpoint.x + 2.5, y = checkpoint.y + 3.5, z = checkpoint.z + 2.5},
@@ -55,10 +68,14 @@ minetest.register_globalstep(function()
 
             if intersect then
                 set_checkpoint(player, checkpoint)
+
+                if index == #checkpoints then
+                    win(player)
+                end
             end
         end
 
-        if p_pos.y < -120 then
+        if pos.y < -120 then
             fail(player)
         end
     end
