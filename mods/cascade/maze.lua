@@ -160,11 +160,11 @@ local function write_maze(pos_min, pos_max, walls)
             ) / 2
 
             for y = pos_min.y + 1, pos_max.y do
-               reset(middle_x, y, middle_z)
-            
+                reset(middle_x, y, middle_z)
+
                 reset(middle_x - 1, y, middle_z)
                 reset(middle_x + 1, y, middle_z)
-            
+
                 reset(middle_x, y, middle_z - 1)
                 reset(middle_x, y, middle_z + 1)
             end
