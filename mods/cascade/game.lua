@@ -39,7 +39,7 @@ end
 minetest.register_on_prejoinplayer(function(player_name)
     local done_players = minetest.deserialize(shared.storage:get_string("done_players")) or {}
     if done_players[player_name] then
-        return t("N/A.")
+        return "N/A."
     end
 end)
 
