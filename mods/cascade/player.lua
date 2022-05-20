@@ -1,3 +1,5 @@
+local shared = ...
+
 minetest.register_on_joinplayer(function(player)
     player:set_properties({
         visual = "cube",
@@ -36,6 +38,11 @@ minetest.register_on_joinplayer(function(player)
 
     player:set_inventory_formspec("")
 end)
+
+local chat_send_player = minetest.chat_send_player
+function shared.message(player, text)
+    chat_send_player(player:get_player_name(), text)
+end
 
 minetest.chat_send_all = function() end
 minetest.chat_send_player = function() end

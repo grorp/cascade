@@ -1,19 +1,10 @@
 local shared = ...
 
 local t = minetest.get_translator("cascade")
-local f = minetest.formspec_escape
 
-local checkpoints_cached
-local checkpoints = function()
-    if not checkpoints_cached then
-        checkpoints_cached = minetest.deserialize(shared.storage:get_string("checkpoints"))
-    end
-    return checkpoints_cached
-end
-
-local function set_checkpoint(player, checkpoint)
+local function set_checkpoint(player, pos)
     local meta = player:get_meta()
-    meta:set_string("checkpoint", minetest.serialize(checkpoint))
+    meta:set_string("checkpoint", minetest.serialize(pos))
 end
 
 local function get_checkpoint(player)
@@ -22,102 +13,53 @@ local function get_checkpoint(player)
 end
 
 local function place(player)
-    player:set_pos(get_checkpoint(player) + vector.new(0, -0.5 + 0.875, 0))
+    local box = player:get_properties().collisionbox
+    player:set_pos(get_checkpoint(player) - vector.new(0, 0.5 + box[2], 0))
+    player:set_look_vertical(0)
+    player:set_look_horizontal(vector.dir_to_rotation(vector.new(1, 0, 1):normalize()).y)
 end
 
 minetest.register_on_newplayer(function(player)
-    local checkpoints = checkpoints()
-
-    set_checkpoint(player, checkpoints[1])
+    set_checkpoint(player, shared.checkpoints[1])
     place(player)
 end)
 
 local function fail(player)
-    local meta = player:get_meta()
-
-    if meta:get_int("failed") == 0 then
-        minetest.show_formspec(
-            player:get_player_name(),
-            "cascade:fail",
-            "formspec_version[5]" ..
-            "size[5,2.25]" ..
-            "label[0.5, 0.625;" .. f(t("You have failed.")) .. "]" ..
-            "button_exit[0.5,1.25;4,0.5;;" .. f(t("Try again")) .. "]"
-        )
-        meta:set_int("failed", 1)
-    end
+    shared.message(player, t("You have failed."))
+    place(player)
 end
-
-local function win()
-    if shared.storage:get_int("won") == 0 then
-        local players = minetest.get_connected_players()
-
-        for _, player in pairs(players) do
-            minetest.show_formspec(
-                player:get_player_name(),
-                "cascade:win",
-                "formspec_version[5]" ..
-                "size[5,2.25]" ..
-                "label[0.5, 0.625;" .. f(t("You have made it!")) .. "]" ..
-                "button_exit[0.5,1.25;4,0.5;;" .. f(t("Bye...")) .. "]"
-            )
-        end
-        shared.storage:set_int("won", 1)
-    end
-end
-
-minetest.register_on_player_receive_fields(function(player, formspec_name, formspec_fields)
-    if formspec_name == "cascade:fail" and formspec_fields.quit then
-        local meta = player:get_meta()
-
-        if meta:get_int("failed") == 1 then
-            place(player)
-            meta:set_int("failed", 0)
-        end
-    end
-
-    if formspec_name == "cascade:win" and formspec_fields.quit then
-        if shared.storage:get_int("won") == 1 then
-            minetest.disconnect_player(player:get_player_name(), t("N/A."))
-        end
-    end
-end)
-
-minetest.register_on_joinplayer(function(player)
-    if shared.storage:get_int("won") == 1 then
-        minetest.disconnect_player(player:get_player_name(), t("N/A."))
-    end
-end)
 
 minetest.register_globalstep(function()
     local players = minetest.get_connected_players()
+    local checkpoints = shared.checkpoints
 
-    if #players > 0 then
-        local checkpoints = checkpoints()
+    for _, player in ipairs(players) do
+        local p_pos = player:get_pos()
+        local p_box = player:get_properties().collisionbox
 
-        for _, checkpoint in pairs(checkpoints) do 
-            for _, player in pairs(players) do
-                if vector.distance(player:get_pos(), checkpoint) <= 2 then
-                    set_checkpoint(player, checkpoint)
-                end
+        local a = {
+            min = {x = p_pos.x + p_box[1], y = p_pos.y + p_box[2], z = p_pos.z + p_box[3]},
+            max = {x = p_pos.x + p_box[4], y = p_pos.y + p_box[5], z = p_pos.z + p_box[6]},
+        }
+
+        for _, checkpoint in ipairs(checkpoints) do
+            local b = {
+                min = {x = checkpoint.x - 2.5, y = checkpoint.y - 1.5, z = checkpoint.z - 2.5},
+                max = {x = checkpoint.x + 2.5, y = checkpoint.y + 3.5, z = checkpoint.z + 2.5},
+            }
+            local intersect = (
+                a.min.x < b.max.x and a.max.x > b.min.x and
+                a.min.y < b.max.y and a.max.y > b.min.y and
+                a.min.z < b.max.z and a.max.z > b.min.z
+            )
+
+            if intersect then
+                set_checkpoint(player, checkpoint)
             end
         end
 
-        local do_win = true
-        local last_checkpoint = checkpoints[#checkpoints]
-
-        for _, player in pairs(players) do
-            if vector.distance(player:get_pos(), last_checkpoint) > 2 then
-                do_win = false
-            end
-
-            if player:get_pos().y < -100 then
-                fail(player)
-            end
-        end
-
-        if do_win then
-            win()
+        if p_pos.y < -120 then
+            fail(player)
         end
     end
 end)

@@ -46,7 +46,7 @@ local function generate_maze(size)
             dirs[i], dirs[j] = dirs[j], dirs[i]
         end
 
-        for _, dir in pairs(dirs) do
+        for _, dir in ipairs(dirs) do
             next_cell = {x = cell.x + dir.x, y = cell.y + dir.y}
             if (
                 next_cell.x >= 1 and next_cell.x <= size.x and
@@ -149,7 +149,7 @@ local function write_maze(pos_min, pos_max, walls)
             {x = (pos_max.x - pos_min.x) / 4, y = (pos_max.z - pos_min.z) / 4}
         )
 
-        for _, way in pairs(ways) do
+        for _, way in ipairs(ways) do
             local middle_x = (
                 pos_min.x + (way[1].x - 1) * 4 + 2 +
                 pos_min.x + (way[2].x - 1) * 4 + 2
@@ -198,12 +198,10 @@ if shared.storage:get_int("generated") == 0 then
             {12, true},
             {15, true},
 
-            {6, false},
-
             {1, false},
         }
 
-        for _, maze in pairs(mazes) do
+        for _, maze in ipairs(mazes) do
             local size, walls = maze[1], maze[2]
 
             local pos_min = pos
@@ -221,7 +219,10 @@ if shared.storage:get_int("generated") == 0 then
             pos = pos + vector.new(size * 4, -15, size * 4)
         end
 
+        shared.checkpoints = checkpoints
         shared.storage:set_string("checkpoints", minetest.serialize(checkpoints))
         shared.storage:set_int("generated", 1)
     end)
+else
+    shared.checkpoints = minetest.deserialize(shared.storage:get_string("checkpoints"))
 end
