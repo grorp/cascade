@@ -42,4 +42,4 @@ tx.break(0.05);
 tx.tone(0.75, 698.4564628660078);
 ```
 
-Then I recreated them with Audacity and amplified them by -18dB.
+Then I recreated them in Audacity and amplified them by -18dB.
