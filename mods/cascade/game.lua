@@ -1,7 +1,5 @@
 local shared = ...
 
-local t = minetest.get_translator("cascade")
-
 local function set_checkpoint(player, pos)
     local meta = player:get_meta()
     meta:set_string("checkpoint", minetest.serialize(pos))
@@ -24,24 +22,17 @@ minetest.register_on_newplayer(function(player)
 end)
 
 local function fail(player)
-    shared.message(player, t("You have failed."))
+    minetest.sound_play("cascade_fail", {to_player = player:get_player_name()})
     place(player)
 end
 
 local function win(player)
-    local done_players = minetest.deserialize(shared.storage:get_string("done_players")) or {}
-    done_players[player:get_player_name()] = true
-    shared.storage:set_string("done_players", minetest.serialize(done_players))
-
-    minetest.disconnect_player(player:get_player_name(), t("N/A."))
-end
-
-minetest.register_on_prejoinplayer(function(player_name)
-    local done_players = minetest.deserialize(shared.storage:get_string("done_players")) or {}
-    if done_players[player_name] then
-        return "N/A."
+    local meta = player:get_meta()
+    if meta:get_int("won") ~= 1 then
+        minetest.sound_play("cascade_win", {to_player = player:get_player_name()})
+        meta:set_int("won", 1)
     end
-end)
+end
 
 minetest.register_globalstep(function()
     local players = minetest.get_connected_players()

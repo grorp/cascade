@@ -184,7 +184,7 @@ local function write_maze(pos_min, pos_max, walls)
     vm:write_to_map()
 end
 
-if shared.storage:get_int("generated") == 0 then
+if shared.storage:get_int("generated") ~= 1 then
     minetest.after(0, function()
         local checkpoints = {}
 
