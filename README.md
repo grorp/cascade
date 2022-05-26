@@ -4,6 +4,8 @@
 
 A game for Minetest. Work in Progress.
 
+Cascade is developed with the latest Git version of Minetest, but mostly works on 5.5.1 as well.
+
 ## License
 
 © 2022 Gregor Parzefall
