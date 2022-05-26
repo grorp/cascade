@@ -1,5 +1,9 @@
 # Cascade
 
+> Make it down the cascade of mazes and ... what actually?
+
+A game for Minetest. Work in Progress.
+
 ## License
 
 © 2022 Gregor Parzefall
