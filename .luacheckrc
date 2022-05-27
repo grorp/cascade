@@ -1,0 +1,5 @@
+globals = {
+    "minetest",
+    "vector",
+    "VoxelArea",
+}
