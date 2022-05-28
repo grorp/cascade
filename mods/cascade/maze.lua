@@ -1,5 +1,9 @@
 local shared = ...
 
+minetest.set_mapgen_setting("mg_name", "singlenode", true)
+minetest.set_mapgen_setting("mg_flags", "nobiomes, nocaves, nodecorations, nodungeons, light, noores", true)
+minetest.register_alias_force("mapgen_singlenode", "air")
+
 minetest.register_node("cascade:floor", {
     tiles = {"cascade_floor.png"},
     pointable = false,
