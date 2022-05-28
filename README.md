@@ -1,6 +1,6 @@
 # Cascade
 
-> Make it down the cascade of mazes and ... what actually?
+> Find the way through a cascade of mazes.
 
 A game for Minetest. Work in Progress.
 
