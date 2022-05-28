@@ -4,7 +4,7 @@
 
 A game for Minetest. Work in Progress.
 
-Cascade is developed with the latest Git version of Minetest, but mostly works on 5.5.1 as well.
+Cascade is developed with the latest Git version of Minetest, but mostly works on 5.5.0 and higher.
 
 ## License
 
