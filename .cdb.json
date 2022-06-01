@@ -1,0 +1,12 @@
+{
+    "type": "GAME",
+    "name": "cascade",
+    "title": "Cascade",
+    "short_description": "Find the way through a cascade of mazes.",
+    "dev_state": "WIP",
+    "tags": ["puzzle"],
+    "license": "GPL-3.0-or-later",
+    "media_license": "CC-BY-SA-4.0",
+    "long_description": "# Cascade\n\n> Find the way through a cascade of mazes.\n\nA game for Minetest. Work in Progress.\n\nCascade is developed with the latest Git version of Minetest, but mostly works on 5.5.0 and higher.\n\n## License\n\n© 2022 Gregor Parzefall\n\nThe image and audio files are licensed under the [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/), everything else is licensed under the [GNU GPL version 3](https://www.gnu.org/licenses/gpl-3.0.html) or any later version.\n\n### Exceptions\n\n-   `mods/cascade/textures/cascade_floor.png`  \n    `mods/cascade/textures/cascade_wall.png`\n\n    [`default/default_stone_block.png`](https://gitlab.com/zughy-friends-minetest/soothing-32/-/blob/3d27660b6b5d5b87fc68b0cc523048b1ef00e733/default/default_stone_block.png)  \n    [`default/default_stone_brick.png`](https://gitlab.com/zughy-friends-minetest/soothing-32/-/blob/3d27660b6b5d5b87fc68b0cc523048b1ef00e733/default/default_stone_brick.png)  \n    from the [Soothing 32](https://gitlab.com/zughy-friends-minetest/soothing-32/) texture pack by Zughy (licensed under the [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/))\n",
+    "repo": "https://github.com/grorp/cascade"
+}
