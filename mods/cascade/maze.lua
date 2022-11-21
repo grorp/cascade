@@ -22,7 +22,7 @@ minetest.register_node("cascade:wall_invisible", {
 })
 
 local function cell_to_string(cell)
-    return tostring(cell.x) .. "," .. tostring(cell.y)
+    return cell.x .. "," .. cell.y
 end
 
 -- https://weblog.jamisbuck.org/2011/1/17/maze-generation-aldous-broder-algorithm
@@ -31,7 +31,7 @@ local function generate_maze(size)
 
     local cell = {x = math.random(1, size.x), y = math.random(1, size.y)}
     local done_cells = {[cell_to_string(cell)] = true}
-    local num_remaining_cells = size.x * size.y - 1
+    local num_cells_remaining = size.x * size.y - 1
 
     local dirs = {
         {x = 1, y = 0},
@@ -40,7 +40,7 @@ local function generate_maze(size)
         {x = 0, y = -1},
     }
 
-    while num_remaining_cells > 0 do
+    while num_cells_remaining > 0 do
         local next_cell
 
         -- https://bost.ocks.org/mike/shuffle/
@@ -64,7 +64,7 @@ local function generate_maze(size)
             ways[#ways + 1] = {cell, next_cell}
 
             done_cells[cell_to_string(next_cell)] = true
-            num_remaining_cells = num_remaining_cells - 1
+            num_cells_remaining = num_cells_remaining - 1
         end
 
         cell = next_cell
