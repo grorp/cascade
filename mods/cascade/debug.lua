@@ -32,16 +32,12 @@ function debug.visualize_aabb(id, box)
 
     if not old_obj then
         local obj = minetest.add_entity(box_center, "cascade:visual_aabb")
-        obj:set_properties({
-            visual_size = box_size,
-        })
+        obj:set_properties({ visual_size = box_size })
         obj:get_luaentity().id = id
         map_id→obj[id] = obj
     else
         old_obj:set_pos(box_center)
-        old_obj:set_properties({
-            visual_size = box_size,
-        })
+        old_obj:set_properties({ visual_size = box_size })
     end
 end
 

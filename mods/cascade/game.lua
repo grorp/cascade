@@ -1,5 +1,5 @@
 local shared = ...
-local debug = dofile(minetest.get_modpath("cascade") .. "/debug.lua")
+-- local debug = dofile(minetest.get_modpath("cascade") .. "/debug.lua")
 
 local function set_checkpoint(player, pos)
     local meta = player:get_meta()
