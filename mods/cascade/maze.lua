@@ -16,9 +16,9 @@ minetest.register_node("cascade:wall", {
 
 minetest.register_node("cascade:wall_invisible", {
     drawtype = "airlike",
+    pointable = false,
     paramtype = "light",
     sunlight_propagates = true,
-    pointable = false,
 })
 
 local function cell_to_string(cell)
@@ -30,9 +30,8 @@ local function generate_maze(size)
     local ways = {}
 
     local cell = {x = math.random(1, size.x), y = math.random(1, size.y)}
-    local done = {}
-    done[cell_to_string(cell)] = true
-    local remaining_count = size.x * size.y - 1
+    local done_cells = {[cell_to_string(cell)] = true}
+    local num_remaining_cells = size.x * size.y - 1
 
     local dirs = {
         {x = 1, y = 0},
@@ -41,12 +40,13 @@ local function generate_maze(size)
         {x = 0, y = -1},
     }
 
-    while remaining_count > 0 do
+    while num_remaining_cells > 0 do
         local next_cell
 
         -- https://bost.ocks.org/mike/shuffle/
+        -- https://stackoverflow.com/a/68486276
         for i = #dirs, 2, -1 do
-            local j = math.random(1, i)
+            local j = math.random(i)
             dirs[i], dirs[j] = dirs[j], dirs[i]
         end
 
@@ -60,11 +60,11 @@ local function generate_maze(size)
             end
         end
 
-        if not done[cell_to_string(next_cell)] then
+        if not done_cells[cell_to_string(next_cell)] then
             ways[#ways + 1] = {cell, next_cell}
 
-            done[cell_to_string(next_cell)] = true
-            remaining_count = remaining_count - 1
+            done_cells[cell_to_string(next_cell)] = true
+            num_remaining_cells = num_remaining_cells - 1
         end
 
         cell = next_cell
