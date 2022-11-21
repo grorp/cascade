@@ -24,7 +24,7 @@ minetest.register_on_newplayer(function(player)
     place(player)
 end)
 
-local function fail(player)
+function shared.fail(player)
     minetest.sound_play("cascade_fail", {to_player = player:get_player_name()})
     place(player)
 end
@@ -77,7 +77,7 @@ minetest.register_globalstep(function()
         end
 
         if player_pos.y < -120 then
-            fail(player)
+            shared.fail(player)
         end
     end
 end)
