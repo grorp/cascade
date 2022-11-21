@@ -15,7 +15,7 @@ minetest.register_on_joinplayer(function(player)
              7/16,  15/16,  7/16,
         },
 
-        -- https://github.com/minetest/minetest/blob/163d3547e65a6cea8a3e555557407e88d8e09183/doc/lua_api.txt#L7290
+        -- https://github.com/minetest/minetest/blob/5.6.1/doc/lua_api.txt#L7643
         nametag_color = "#00000000",
 
         eye_height = 9/16 + 1/32, -- The exact eye height of the texture.

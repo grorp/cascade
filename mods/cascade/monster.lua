@@ -30,7 +30,7 @@ function Monster:on_step(dtime, moveresult)
     local target
 
     local candidates = minetest.get_objects_inside_radius(self.object:get_pos(), 50)
-    for _, candidate in pairs(candidates) do
+    for _, candidate in ipairs(candidates) do
         if candidate:is_player() and (not target or
             vector.distance(self.object.get_pos(), candidate.get_pos()) <
             vector.distance(self.object.get_pos(), target.get_pos())

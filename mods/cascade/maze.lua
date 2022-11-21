@@ -29,7 +29,7 @@ end
 local function generate_maze(size)
     local ways = {}
 
-    local cell = {x = math.random(1, size.x), y = math.random(1, size.y)}
+    local cell = {x = math.random(size.x), y = math.random(size.y)}
     local done_cells = {[cell_to_string(cell)] = true}
     local num_cells_remaining = size.x * size.y - 1
 
