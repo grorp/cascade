@@ -1,7 +1,7 @@
 minetest.register_on_joinplayer(function(player)
     player:set_properties({
         visual = "cube",
-        visual_size = vector.new(0.875, 1.875, 0.875),
+        visual_size = vector.new(14/16, 30/16, 14/16),
         textures = {
             "cascade_player_top.png",   "cascade_player_top.png",
             "cascade_player_side.png",  "cascade_player_side.png",
@@ -11,14 +11,14 @@ minetest.register_on_joinplayer(function(player)
 
         physical = true,
         collisionbox = {
-            -0.4375, -0.9375, -0.4375,
-             0.4375,  0.9375,  0.4375,
+            -7/16, -15/16, -7/16,
+             7/16,  15/16,  7/16,
         },
 
         -- https://github.com/minetest/minetest/blob/163d3547e65a6cea8a3e555557407e88d8e09183/doc/lua_api.txt#L7290
         nametag_color = "#00000000",
 
-        eye_height = 0.59375, -- The exact eye height of the texture.
+        eye_height = 9/16 + 1/32, -- The exact eye height of the texture.
     })
 
     player:set_armor_groups({immortal = 1})

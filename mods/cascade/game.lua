@@ -1,4 +1,5 @@
 local shared = ...
+local debug = dofile(minetest.get_modpath("cascade") .. "/debug.lua")
 
 local function set_checkpoint(player, pos)
     local meta = player:get_meta()
@@ -11,9 +12,11 @@ local function get_checkpoint(player)
 end
 
 local function place(player)
-    player:set_pos(get_checkpoint(player) + vector.new(0, -0.5 + 0.9375, 0))
+    player:set_pos(get_checkpoint(player) + vector.new(0, -0.5 + 15/16, 0))
     player:set_look_vertical(0)
-    player:set_look_horizontal(vector.dir_to_rotation(vector.new(1, 0, 1):normalize()).y)
+    player:set_look_horizontal(
+        vector.dir_to_rotation(vector.new(1, 0, 1):normalize()).y
+    )
 end
 
 minetest.register_on_newplayer(function(player)
@@ -34,39 +37,46 @@ local function win(player)
     end
 end
 
+local function aabbs_intersect(a, b)
+    return
+        a.min.x <= b.max.x and
+        a.max.x >= b.min.x and
+        a.min.y <= b.max.y and
+        a.max.y >= b.min.y and
+        a.min.z <= b.max.z and
+        a.max.z >= b.min.z
+end
+
 minetest.register_globalstep(function()
     local players = minetest.get_connected_players()
     local checkpoints = shared.checkpoints
 
     for _, player in ipairs(players) do
-        local pos = player:get_pos()
-
-        local a = {
-            min = {x = pos.x - 0.4375, y = pos.y - 0.9375, z = pos.z - 0.4375},
-            max = {x = pos.x + 0.4375, y = pos.y + 0.9375, z = pos.z + 0.4375},
+        local player_pos = player:get_pos()
+        local player_aabb = {
+            min = player_pos - vector.new(7/16, 15/16, 7/16),
+            max = player_pos + vector.new(7/16, 15/16, 7/16),
         }
+        -- debug.visualize_aabb("p_" .. player:get_player_name(), player_aabb)
 
-        for index, checkpoint in ipairs(checkpoints) do
-            local b = {
-                min = {x = checkpoint.x - 2.5, y = checkpoint.y - 1.5, z = checkpoint.z - 2.5},
-                max = {x = checkpoint.x + 2.5, y = checkpoint.y + 3.5, z = checkpoint.z + 2.5},
+        for check_index, check_pos in ipairs(checkpoints) do
+            local check_aabb = {
+                min = check_pos - vector.new(2.5, 1.5, 2.5),
+                max = check_pos + vector.new(2.5, 3.5, 2.5),
             }
-            local intersect = (
-                a.min.x < b.max.x and a.max.x > b.min.x and
-                a.min.y < b.max.y and a.max.y > b.min.y and
-                a.min.z < b.max.z and a.max.z > b.min.z
-            )
+            -- debug.visualize_aabb("c_" .. check_index, check_aabb)
 
-            if intersect then
-                set_checkpoint(player, checkpoint)
+            if aabbs_intersect(player_aabb, check_aabb) then
+                -- io.write("\a"); io.flush()
 
-                if index == #checkpoints then
+                set_checkpoint(player, check_pos)
+                if check_index == #checkpoints then
                     win(player)
                 end
             end
         end
 
-        if pos.y < -120 then
+        if player_pos.y < -120 then
             fail(player)
         end
     end
