@@ -53,6 +53,26 @@ minetest.register_globalstep(function()
 
     for _, player in ipairs(players) do
         local player_pos = player:get_pos()
+
+        local remove_keys = {}
+        -- print("monsters")
+        for key, monster_pos in pairs(shared.monster_positions) do
+            -- print("monster")
+            if vector.distance(player_pos, monster_pos) < 50 then
+                -- print("spawning a monster because it is in range, marking it for removal from the list")
+                minetest.add_entity(monster_pos, "cascade:monster")
+                table.insert(remove_keys, key)
+            end
+        end
+        if #remove_keys > 0 then
+            for _, k in ipairs(remove_keys) do
+                -- print("removing a monster from the list")
+                shared.monster_positions[k] = nil
+            end
+            -- print("saving the list")
+            shared.storage:set_string("monster_positions", minetest.serialize(shared.monster_positions))
+        end
+
         local player_aabb = {
             min = player_pos - vector.new(7/16, 15/16, 7/16),
             max = player_pos + vector.new(7/16, 15/16, 7/16),

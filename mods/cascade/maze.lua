@@ -7,11 +7,17 @@ minetest.register_alias_force("mapgen_singlenode", "air")
 minetest.register_node("cascade:floor", {
     tiles = {"cascade_floor.png"},
     pointable = false,
+    sounds = {
+        footstep = {name = "default_hard_footstep", gain = 0.2},
+    },
 })
 
 minetest.register_node("cascade:wall", {
     tiles = {"cascade_wall.png"},
     pointable = false,
+    sounds = {
+        footstep = {name = "default_hard_footstep", gain = 0.2},
+    },
 })
 
 minetest.register_node("cascade:wall_invisible", {
@@ -73,7 +79,7 @@ local function generate_maze(size)
     return ways
 end
 
-local function write_maze(pos_min, pos_max, walls)
+local function write_maze(pos_min, pos_max, walls, num_monsters, monster_positions)
     local vm = minetest.get_voxel_manip()
     local vm_pos_min, vm_pos_max = vm:read_from_map(pos_min, pos_max)
     local vm_data = vm:get_data()
@@ -101,6 +107,11 @@ local function write_maze(pos_min, pos_max, walls)
             floor(x, pos_min.y, z)
         end
     end
+
+    local size_cells = {
+        x = (pos_max.x - pos_min.x) / 4,
+        y = (pos_max.z - pos_min.z) / 4,
+    }
 
     if walls then
         local id_wall = minetest.get_content_id("cascade:wall")
@@ -149,9 +160,7 @@ local function write_maze(pos_min, pos_max, walls)
             end
         end
 
-        local ways = generate_maze(
-            {x = (pos_max.x - pos_min.x) / 4, y = (pos_max.z - pos_min.z) / 4}
-        )
+        local ways = generate_maze(size_cells)
 
         for _, way in ipairs(ways) do
             local middle_x = (
@@ -184,29 +193,58 @@ local function write_maze(pos_min, pos_max, walls)
         end
     end
 
+    if num_monsters > 0 then
+        local occupied_cells = {}
+
+        local function is_cell_free(cell)
+            for _, ocell in ipairs(occupied_cells) do
+                if cell.x == ocell.x and cell.y == ocell.y then
+                    return false
+                end
+            end
+            return true
+        end
+
+        for i = 1, num_monsters do
+            local cell
+            repeat
+                cell = {x = math.random(size_cells.x), y = math.random(size_cells.y)}
+            until is_cell_free(cell)
+            table.insert(occupied_cells, cell)
+
+            local world_pos = pos_min + vector.new(
+                (cell.x - 1) * 4 + 2,
+                0.5 + 1.375,
+                (cell.y - 1) * 4 + 2
+            )
+            monster_positions[world_pos:to_string()] = world_pos
+        end
+    end
+
     vm:set_data(vm_data_new)
     vm:write_to_map()
 end
 
 if shared.storage:get_int("generated") ~= 1 then
     minetest.after(0, function()
+        local monster_positions = {}
         local checkpoints = {}
 
         local pos = vector.zero()
 
         local mazes = {
-            {1, false},
+            {1, false, 0},
 
-            {6, true},
-            {9, true},
-            {12, true},
-            {15, true},
+            {6, true, 1}, -- one monster for approx. 5x5 cells
+            {9, true, 3},
+            {12, true, 6},
+            {15, true, 9},
 
-            {1, false},
+            {1, false, 0},
         }
 
         for _, maze in ipairs(mazes) do
-            local size, walls = maze[1], maze[2]
+            local size, walls, num_monsters = unpack(maze)
 
             local pos_min = pos
             local pos_max = pos + vector.new(size * 4, 19, size * 4)
@@ -214,7 +252,9 @@ if shared.storage:get_int("generated") ~= 1 then
             write_maze(
                 pos_min,
                 pos_max,
-                walls
+                walls,
+                num_monsters,
+                monster_positions
             )
             checkpoints[#checkpoints + 1] = vector.new(
                 pos_max.x - 2, pos_min.y + 1, pos_max.z - 2
@@ -223,10 +263,13 @@ if shared.storage:get_int("generated") ~= 1 then
             pos = pos + vector.new(size * 4, -15, size * 4)
         end
 
+        shared.monster_positions = monster_positions
         shared.checkpoints = checkpoints
+        shared.storage:set_string("monster_positions", minetest.serialize(monster_positions))
         shared.storage:set_string("checkpoints", minetest.serialize(checkpoints))
         shared.storage:set_int("generated", 1)
     end)
 else
+    shared.monster_positions = minetest.deserialize(shared.storage:get_string("monster_positions"))
     shared.checkpoints = minetest.deserialize(shared.storage:get_string("checkpoints"))
 end
