@@ -25,8 +25,14 @@ minetest.register_on_newplayer(function(player)
 end)
 
 function shared.fail(player)
-    minetest.sound_play("cascade_fail", {to_player = player:get_player_name()})
-    place(player)
+    local meta = player:get_meta()
+    local last_fail = tonumber(meta:get_string("last_fail"))
+    local now = minetest.get_us_time()
+    if not last_fail or now - last_fail > 500000 then
+        minetest.sound_play("cascade_fail", {to_player = player:get_player_name()})
+        place(player)
+        meta:set_string("last_fail", tostring(now))
+    end
 end
 
 local function win(player)
