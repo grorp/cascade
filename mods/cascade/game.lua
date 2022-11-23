@@ -57,26 +57,17 @@ minetest.register_globalstep(function()
     local players = minetest.get_connected_players()
     local checkpoints = shared.checkpoints
 
+    local monster_positions_modified = false
+
     for _, player in ipairs(players) do
         local player_pos = player:get_pos()
 
-        local remove_keys = {}
-        -- print("monsters")
         for key, monster_pos in pairs(shared.monster_positions) do
-            -- print("monster")
-            if vector.distance(player_pos, monster_pos) < 50 then
-                -- print("spawning a monster because it is in range, marking it for removal from the list")
+            if vector.distance(player_pos, monster_pos) <= shared.MONSTER_RADIUS then
                 minetest.add_entity(monster_pos, "cascade:monster")
-                table.insert(remove_keys, key)
+                shared.monster_positions[key] = nil
+                monster_positions_modified = true
             end
-        end
-        if #remove_keys > 0 then
-            for _, k in ipairs(remove_keys) do
-                -- print("removing a monster from the list")
-                shared.monster_positions[k] = nil
-            end
-            -- print("saving the list")
-            shared.storage:set_string("monster_positions", minetest.serialize(shared.monster_positions))
         end
 
         local player_aabb = {
@@ -105,5 +96,9 @@ minetest.register_globalstep(function()
         if player_pos.y < -120 then
             shared.fail(player)
         end
+    end
+
+    if monster_positions_modified then
+        shared.storage:set_string("monster_positions", minetest.serialize(shared.monster_positions))
     end
 end)

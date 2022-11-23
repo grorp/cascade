@@ -79,7 +79,13 @@ local function generate_maze(size)
     return ways
 end
 
-local function write_maze(pos_min, pos_max, walls, num_monsters, monster_positions)
+local WALLS = {
+    NO_WALLS = 1,
+    OUTER_WALLS = 2,
+    ALL_WALLS = 3,
+}
+
+local function write_maze(pos_min, pos_max, walls, num_monsters, ref_monster_positions)
     local vm = minetest.get_voxel_manip()
     local vm_pos_min, vm_pos_max = vm:read_from_map(pos_min, pos_max)
     local vm_data = vm:get_data()
@@ -113,19 +119,32 @@ local function write_maze(pos_min, pos_max, walls, num_monsters, monster_positio
         y = (pos_max.z - pos_min.z) / 4,
     }
 
-    if walls then
-        local id_wall = minetest.get_content_id("cascade:wall")
-        local id_wall_invisible = minetest.get_content_id("cascade:wall_invisible")
+    local id_wall = minetest.get_content_id("cascade:wall")
+    local id_wall_invisible = minetest.get_content_id("cascade:wall_invisible")
 
-        local function wall(x, y, z)
-            local index = vm_area:index(x, y, z)
-            if y <= pos_min.y + 4 then
-                vm_data_new[index] = id_wall
-            else
-                vm_data_new[index] = id_wall_invisible
+    local function wall(x, y, z)
+        local index = vm_area:index(x, y, z)
+        if y <= pos_min.y + 4 then
+            vm_data_new[index] = id_wall
+        else
+            vm_data_new[index] = id_wall_invisible
+        end
+    end
+
+    if walls == WALLS.OUTER_WALLS then
+        for y = pos_min.y + 1, pos_max.y do
+            for x = pos_min.x, pos_max.x do
+                wall(x, y, pos_min.z)
+                wall(x, y, pos_max.z)
+            end
+            for z = pos_min.z, pos_max.z do
+                wall(pos_min.z, y, z)
+                wall(pos_max.z, y, z)
             end
         end
+    end
 
+    if walls == WALLS.ALL_WALLS then
         for x = pos_min.x, pos_max.x - 4, 4 do
             for z = pos_min.z, pos_max.z - 4, 4 do
                 for y = pos_min.y + 1, pos_max.y do
@@ -151,15 +170,6 @@ local function write_maze(pos_min, pos_max, walls, num_monsters, monster_positio
             end
         end
 
-        for y = pos_min.y + 5, pos_max.y do
-            for x = pos_min.x, pos_min.x + 3 do
-                reset(x, y, pos_min.z)
-            end
-            for z = pos_min.z, pos_min.z + 3 do
-                reset(pos_min.x, y, z)
-            end
-        end
-
         local ways = generate_maze(size_cells)
 
         for _, way in ipairs(ways) do
@@ -182,7 +192,9 @@ local function write_maze(pos_min, pos_max, walls, num_monsters, monster_positio
                 reset(middle_x, y, middle_z + 1)
             end
         end
+    end
 
+    if walls == WALLS.OUTER_WALLS or walls == WALLS.ALL_WALLS then
         for y = pos_min.y + 1, pos_max.y do
             for x = pos_max.x - 3, pos_max.x do
                 reset(x, y, pos_max.z)
@@ -191,6 +203,16 @@ local function write_maze(pos_min, pos_max, walls, num_monsters, monster_positio
                 reset(pos_max.x, y, z)
             end
         end
+
+        for y = pos_min.y + 5, pos_max.y do
+            for x = pos_min.x, pos_min.x + 3 do
+                reset(x, y, pos_min.z)
+            end
+            for z = pos_min.z, pos_min.z + 3 do
+                reset(pos_min.x, y, z)
+            end
+        end
+
     end
 
     if num_monsters > 0 then
@@ -217,7 +239,7 @@ local function write_maze(pos_min, pos_max, walls, num_monsters, monster_positio
                 0.5 + 1.375,
                 (cell.y - 1) * 4 + 2
             )
-            monster_positions[world_pos:to_string()] = world_pos
+            ref_monster_positions[world_pos:to_string()] = world_pos
         end
     end
 
@@ -230,18 +252,19 @@ if shared.storage:get_int("generated") ~= 1 then
         local monster_positions = {}
         local checkpoints = {}
 
-        local pos = vector.zero()
-
         local mazes = {
-            {1, false, 0},
+            {1, WALLS.NO_WALLS, 0},
 
-            {6, true, 1}, -- one monster for approx. 5x5 cells
-            {9, true, 3},
-            {12, true, 6},
-            {15, true, 9},
+            {6, WALLS.ALL_WALLS, 1}, -- one monster for approx. 5x5 cells
+            {9, WALLS.ALL_WALLS, 3},
+            {12, WALLS.ALL_WALLS, 6},
+            {15, WALLS.ALL_WALLS, 9},
+            {15, WALLS.OUTER_WALLS, 9},
 
-            {1, false, 0},
+            {1, WALLS.NO_WALLS, 0},
         }
+
+        local pos = vector.zero()
 
         for _, maze in ipairs(mazes) do
             local size, walls, num_monsters = unpack(maze)

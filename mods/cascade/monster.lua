@@ -23,7 +23,7 @@ function Monster:on_activate()
 end
 
 local GRAVITY = vector.new(0, -9.81, 0)
-local MONSTER_RADIUS = 50
+shared.MONSTER_RADIUS = 50
 local MONSTER_ACCEL = 5
 local MONSTER_DECEL = 5
 
@@ -33,7 +33,7 @@ function Monster:on_step(dtime, moveresult)
     local target
 
     local candidates = minetest.get_objects_inside_radius(
-        self.object:get_pos(), MONSTER_RADIUS
+        self.object:get_pos(), shared.MONSTER_RADIUS
     )
     for _, candidate in ipairs(candidates) do
         if candidate:is_player() and (not target or
