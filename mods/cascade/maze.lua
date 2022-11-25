@@ -90,7 +90,7 @@ local WALLS = {
 }
 
 local function write_maze(pos_min, pos_max, walls, num_monsters, ref_monster_positions)
-    local vm = minetest.get_voxel_manip()
+    local vm = VoxelManip()
     local vm_pos_min, vm_pos_max = vm:read_from_map(pos_min, pos_max)
     local vm_data = vm:get_data()
     local vm_area = VoxelArea:new({MinEdge = vm_pos_min, MaxEdge = vm_pos_max})

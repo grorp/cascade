@@ -77,8 +77,10 @@ minetest.register_globalstep(function()
 
         for check_index, check_pos in ipairs(checkpoints) do
             local check_aabb = {
-                min = check_pos - vector.new(2.5, 1.5, 2.5),
-                max = check_pos + vector.new(2.5, 3.5, 2.5),
+                -- 0.1 m smaller in each direction to prevent activating the
+                -- checkpoint through walls.
+                min = check_pos - vector.new(2.4, 1.4, 2.4),
+                max = check_pos + vector.new(2.4, 3.4, 2.4),
             }
             -- debug.visualize_aabb("c_" .. check_index, check_aabb)
 
