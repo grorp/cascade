@@ -10,7 +10,7 @@ Cascade requires at least Minetest 5.5.0. Due to a bug in Minetest, you need at 
 
 © 2022 Gregor Parzefall
 
-The image and audio files are licensed under the [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/), everything else is licensed under the [GNU General Public License version 3](https://www.gnu.org/licenses/gpl-3.0.html) or any later version.
+The image and audio files are licensed under the [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/), everything else is licensed under the [GNU GPL version 3](https://www.gnu.org/licenses/gpl-3.0.html) or any later version.
 
 ### Exceptions
 
