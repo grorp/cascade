@@ -30,16 +30,16 @@ class Tx {
 // fail
 
 const tx = new Tx();
-tx.tone(0.15, 87.30705785825097);
+tx.tone(0.15, 87.30705785825097); // F2
 ```
 
 ```javascript
 // win
 
 const tx = new Tx();
-tx.tone(0.15, 698.4564628660078);
+tx.tone(0.15, 698.4564628660078); // F5
 tx.break(0.05);
-tx.tone(0.75, 698.4564628660078);
+tx.tone(0.75, 698.4564628660078); // F5
 ```
 
-Then I recreated them in Audacity and amplified them by -18dB.
+Then I recreated them in Audacity and amplified them by -18dB. Musical note frequencies from https://www.szynalski.com/tone-generator/.
