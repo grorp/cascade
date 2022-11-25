@@ -231,7 +231,7 @@ local function write_maze(pos_min, pos_max, walls, num_monsters, ref_monster_pos
             return true
         end
 
-        for i = 1, num_monsters do
+        for _ = 1, num_monsters do
             local cell
             repeat
                 cell = {x = math.random(size_cells.x), y = math.random(size_cells.y)}

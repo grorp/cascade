@@ -54,25 +54,25 @@ minetest.register_on_chatcommand(function()
     return true
 end)
 
-local map_name→running = {}
+local map_name_to_running = {}
 
 minetest.register_globalstep(function()
     for _, player in ipairs(minetest.get_connected_players()) do
         local name = player:get_player_name()
         local ctrl = player:get_player_control()
 
-        if ctrl.aux1 and not map_name→running[name] then
+        if ctrl.aux1 and not map_name_to_running[name] then
             player:set_physics_override({ speed = PLAYER_RUN_SPEED })
             player:set_fov(PLAYER_RUN_FOV, true, PLAYER_FOV_TRANSITION_DURATION)
-            map_name→running[name] = true
-        elseif not ctrl.aux1 and map_name→running[name] then
+            map_name_to_running[name] = true
+        elseif not ctrl.aux1 and map_name_to_running[name] then
             player:set_physics_override({ speed = PLAYER_WALK_SPEED })
             player:set_fov(0, true, PLAYER_FOV_TRANSITION_DURATION)
-            map_name→running[name] = false
+            map_name_to_running[name] = false
         end
     end
 end)
 
 minetest.register_on_leaveplayer(function(player)
-    map_name→running[player:get_player_name()] = nil
+    map_name_to_running[player:get_player_name()] = nil
 end)

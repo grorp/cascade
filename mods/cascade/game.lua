@@ -56,7 +56,6 @@ end
 minetest.register_globalstep(function()
     local players = minetest.get_connected_players()
     local checkpoints = shared.checkpoints
-
     local monster_positions_modified = false
 
     for _, player in ipairs(players) do

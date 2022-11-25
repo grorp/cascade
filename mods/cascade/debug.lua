@@ -1,6 +1,6 @@
 local debug = {}
 
-local map_id→obj = {}
+local map_id_to_obj = {}
 
 minetest.register_entity("cascade:visual_aabb", {
     initial_properties = {
@@ -16,7 +16,7 @@ minetest.register_entity("cascade:visual_aabb", {
     },
 
     on_deactivate = function(self)
-        map_id→obj[self.id] = nil
+        map_id_to_obj[self.id] = nil
     end,
 })
 
@@ -28,13 +28,13 @@ function debug.visualize_aabb(id, box)
     local box_center = (box.min + box.max) / 2
     local box_size = box.max - box.min
 
-    local old_obj = map_id→obj[id]
+    local old_obj = map_id_to_obj[id]
 
     if not old_obj then
         local obj = minetest.add_entity(box_center, "cascade:visual_aabb")
         obj:set_properties({ visual_size = box_size })
         obj:get_luaentity().id = id
-        map_id→obj[id] = obj
+        map_id_to_obj[id] = obj
     else
         old_obj:set_pos(box_center)
         old_obj:set_properties({ visual_size = box_size })
