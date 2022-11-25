@@ -1,23 +1,26 @@
 local shared = ...
 
 minetest.set_mapgen_setting("mg_name", "singlenode", true)
-minetest.set_mapgen_setting("mg_flags", "nobiomes, nocaves, nodecorations, nodungeons, light, noores", true)
+minetest.set_mapgen_setting("mg_flags", "nocaves, nodungeons, light, nodecorations, nobiomes, noores", true)
 minetest.register_alias_force("mapgen_singlenode", "air")
+
+local stone_sounds = {
+    footstep = {name = "default_hard_footstep", gain = 0.2},
+}
+local glass_sounds = {
+    footstep = {name = "default_glass_footstep", gain = 0.3},
+}
 
 minetest.register_node("cascade:floor", {
     tiles = {"cascade_floor.png"},
     pointable = false,
-    sounds = {
-        footstep = {name = "default_hard_footstep", gain = 0.2},
-    },
+    sounds = stone_sounds,
 })
 
 minetest.register_node("cascade:wall", {
     tiles = {"cascade_wall.png"},
     pointable = false,
-    sounds = {
-        footstep = {name = "default_hard_footstep", gain = 0.2},
-    },
+    sounds = stone_sounds,
 })
 
 minetest.register_node("cascade:wall_invisible", {
@@ -25,6 +28,7 @@ minetest.register_node("cascade:wall_invisible", {
     pointable = false,
     paramtype = "light",
     sunlight_propagates = true,
+    sounds = glass_sounds,
 })
 
 local function cell_to_string(cell)
