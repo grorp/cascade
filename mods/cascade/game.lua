@@ -62,15 +62,11 @@ minetest.register_globalstep(function()
     for _, player in ipairs(players) do
         local player_pos = player:get_pos()
 
-        -- The world might have been created with a version of the game where
-        -- there were no monsters yet.
-        if monster_positions then
-            for key, monster_pos in pairs(monster_positions) do
-                if vector.distance(player_pos, monster_pos) <= shared.MONSTER_RADIUS then
-                    minetest.add_entity(monster_pos, "cascade:monster")
-                    monster_positions[key] = nil
-                    monster_positions_modified = true
-                end
+        for key, monster_pos in pairs(monster_positions) do
+            if vector.distance(player_pos, monster_pos) <= shared.MONSTER_RADIUS then
+                minetest.add_entity(monster_pos, "cascade:monster")
+                monster_positions[key] = nil
+                monster_positions_modified = true
             end
         end
 

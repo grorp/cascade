@@ -297,6 +297,10 @@ if shared.storage:get_int("generated") ~= 1 then
         shared.storage:set_int("generated", 1)
     end)
 else
-    shared.monster_positions = minetest.deserialize(shared.storage:get_string("monster_positions"))
-    shared.checkpoints = minetest.deserialize(shared.storage:get_string("checkpoints"))
+    -- The world might have been created with a version of the game where there
+    -- were no monsters yet.
+    shared.monster_positions =
+        minetest.deserialize(shared.storage:get_string("monster_positions")) or {}
+    shared.checkpoints =
+        minetest.deserialize(shared.storage:get_string("checkpoints"))
 end
