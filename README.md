@@ -6,6 +6,13 @@ A game for Minetest. Work in Progress.
 
 Cascade requires at least Minetest 5.5.0. Due to a bug in Minetest, you need at least Minetest 5.6.0 for footstep sounds to work.
 
+Changes in v1.1.0:
+
+-   Added monsters  
+    They only spawn in new worlds. Strictly speaking, it is a single monster that spawns multiple times.
+-   Added sprint on the Aux1 key (usually E)
+-   Added footstep sounds :-)
+
 ## License
 
 © 2022 Gregor Parzefall
