@@ -23,6 +23,7 @@ function Monster:on_activate()
 end
 
 local GRAVITY = vector.new(0, -9.81, 0)
+local MAX_TARGET_DISTANCE = 50
 local MONSTER_ACCEL = 5
 local MONSTER_DECEL = 5
 
@@ -31,9 +32,7 @@ function Monster:on_step(dtime, moveresult)
 
     local target
 
-    local candidates = minetest.get_objects_inside_radius(
-        self.object:get_pos(), shared.MONSTER_RADIUS
-    )
+    local candidates = minetest.get_objects_inside_radius(self.object:get_pos(), MAX_TARGET_DISTANCE)
     for _, candidate in ipairs(candidates) do
         if candidate:is_player() and (not target or
             vector.distance(self.object:get_pos(), candidate:get_pos()) <
@@ -63,7 +62,7 @@ function Monster:on_step(dtime, moveresult)
 
     for _, collision in ipairs(moveresult.collisions) do
         if collision.type == "object" and collision.object:is_player() then
-            shared.fail(target)
+            shared.player_fail(target)
             break
         end
     end

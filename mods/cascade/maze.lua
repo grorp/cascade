@@ -293,19 +293,21 @@ function shared.make_next_maze()
     data.size = data.size + 2
 end
 
+function shared.save()
+    assert(shared.next_maze)
+    shared.storage:set_string("next_maze",         minetest.serialize(shared.next_maze))
+    shared.storage:set_string("monster_positions", minetest.serialize(shared.monster_positions))
+    shared.storage:set_string("checkpoints",       minetest.serialize(shared.checkpoints))
+end
+
 if shared.storage:get_int("generated") ~= 1 then
     minetest.after(0, function()
         make_initial_maze()
-
-        shared.storage:set_string("monster_positions", minetest.serialize(shared.monster_positions))
-        shared.storage:set_string("checkpoints", minetest.serialize(shared.checkpoints))
+        shared.save()
         shared.storage:set_int("generated", 1)
     end)
 else
-    -- The world might have been created with a version of the game where there
-    -- were no monsters yet.
-    shared.monster_positions =
-        minetest.deserialize(shared.storage:get_string("monster_positions")) or {}
-    shared.checkpoints =
-        minetest.deserialize(shared.storage:get_string("checkpoints"))
+    shared.next_maze         = minetest.deserialize(shared.storage:get_string("next_maze"))
+    shared.monster_positions = minetest.deserialize(shared.storage:get_string("monster_positions")) or {}
+    shared.checkpoints       = minetest.deserialize(shared.storage:get_string("checkpoints"))
 end
