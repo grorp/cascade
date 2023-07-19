@@ -61,11 +61,14 @@ minetest.register_globalstep(function()
         local name = player:get_player_name()
         local ctrl = player:get_player_control()
 
-        if ctrl.aux1 and not map_name_to_running[name] then
+        local should_run = ctrl.up and ctrl.aux1 and
+            (not ctrl.down) and (not ctrl.sneak) and (not player:get_attach())
+
+        if should_run and not map_name_to_running[name] then
             player:set_physics_override({ speed = PLAYER_RUN_SPEED })
             player:set_fov(PLAYER_RUN_FOV, true, PLAYER_FOV_TRANSITION_DURATION)
             map_name_to_running[name] = true
-        elseif not ctrl.aux1 and map_name_to_running[name] then
+        elseif not should_run and map_name_to_running[name] then
             player:set_physics_override({ speed = PLAYER_WALK_SPEED })
             player:set_fov(0, true, PLAYER_FOV_TRANSITION_DURATION)
             map_name_to_running[name] = false
