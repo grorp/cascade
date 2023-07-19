@@ -30,28 +30,7 @@ minetest.register_on_joinplayer(function(player)
 
     player:set_physics_override({ speed = PLAYER_WALK_SPEED })
 
-    player:hud_set_flags({
-        basic_debug = false,
-        breathbar = false,
-        crosshair = false,
-        healthbar = false,
-        hotbar = false,
-        minimap = false,
-        minimap_radar = false,
-        wielditem = false,
-    })
-
     player:set_inventory_formspec("")
-end)
-
-minetest.chat_send_all = function() end
-minetest.chat_send_player = function() end
-
-minetest.register_on_chat_message(function()
-    return true
-end)
-minetest.register_on_chatcommand(function()
-    return true
 end)
 
 local map_name_to_running = {}

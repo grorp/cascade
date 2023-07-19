@@ -23,7 +23,6 @@ function Monster:on_activate()
 end
 
 local GRAVITY = vector.new(0, -9.81, 0)
-shared.MONSTER_RADIUS = 50
 local MONSTER_ACCEL = 5
 local MONSTER_DECEL = 5
 

@@ -53,6 +53,8 @@ local function aabbs_intersect(a, b)
         a.max.z >= b.min.z
 end
 
+local TRIGGER_RADIUS = 64
+
 minetest.register_globalstep(function()
     local players = minetest.get_connected_players()
     local monster_positions = shared.monster_positions
@@ -62,8 +64,12 @@ minetest.register_globalstep(function()
     for _, player in ipairs(players) do
         local player_pos = player:get_pos()
 
+        if vector.distance(player_pos, shared.next_maze.pos) <= TRIGGER_RADIUS then
+            shared.make_next_maze()
+        end
+
         for key, monster_pos in pairs(monster_positions) do
-            if vector.distance(player_pos, monster_pos) <= shared.MONSTER_RADIUS then
+            if vector.distance(player_pos, monster_pos) <= TRIGGER_RADIUS then
                 minetest.add_entity(monster_pos, "cascade:monster")
                 monster_positions[key] = nil
                 monster_positions_modified = true
@@ -95,7 +101,7 @@ minetest.register_globalstep(function()
             end
         end
 
-        if player_pos.y < -120 then
+        if player_pos.y < -10000 then
             shared.fail(player)
         end
     end
