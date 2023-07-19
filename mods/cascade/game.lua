@@ -74,7 +74,6 @@ minetest.register_globalstep(function()
 
         for key, monster_pos in pairs(shared.monster_positions) do
             if vector.distance(player_pos, monster_pos) <= MAPGEN_TRIGGER_DISTANCE then
-                print("spawning monster")
                 minetest.add_entity(monster_pos, "cascade:monster")
                 shared.monster_positions[key] = nil
                 should_save = true
@@ -97,6 +96,7 @@ minetest.register_globalstep(function()
             -- debug.visualize_aabb("c_" .. check_index, check_aabb)
 
             if aabbs_intersect(player_aabb, check_aabb) then
+                -- io.write("\a"); io.flush()
                 player_set_checkpoint(player, check_pos)
 
                 -- `shared.next_maze` will be nil if this is an old, non-infinite
@@ -104,8 +104,6 @@ minetest.register_globalstep(function()
                 if not shared.next_maze and check_index == #shared.checkpoints then
                     player_win(player)
                 end
-
-                -- io.write("\a"); io.flush()
             end
         end
 

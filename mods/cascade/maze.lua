@@ -307,7 +307,6 @@ function shared.save()
     shared.storage:set_string("next_maze",         minetest.serialize(shared.next_maze))
     shared.storage:set_string("monster_positions", minetest.serialize(shared.monster_positions))
     shared.storage:set_string("checkpoints",       minetest.serialize(shared.checkpoints))
-    print("saved")
 end
 
 if shared.storage:get_int("generated") ~= 1 then
@@ -325,5 +324,4 @@ else
     -- of Cascade. Fall back to an empty table.
     shared.monster_positions = minetest.deserialize(shared.storage:get_string("monster_positions")) or {}
     shared.checkpoints       = minetest.deserialize(shared.storage:get_string("checkpoints"))
-    print("loaded")
 end
