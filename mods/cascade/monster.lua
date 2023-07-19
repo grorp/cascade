@@ -61,7 +61,7 @@ function Monster:on_step(dtime, moveresult)
     end
 
     for _, collision in ipairs(moveresult.collisions) do
-        if collision.type == "object" and collision.object:is_player() then
+        if collision.type == "object" and collision.object == target then
             shared.player_fail(target)
             break
         end
