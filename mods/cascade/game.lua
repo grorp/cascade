@@ -54,13 +54,17 @@ minetest.register_globalstep(function()
     for _, player in ipairs(players) do
         local player_pos = player:get_pos()
 
-        if vector.distance(player_pos, shared.next_maze.pos) <= MAPGEN_TRIGGER_DISTANCE then
+        -- `shared.next_maze` can be nil if the world was created with an old
+        -- version of Cascade.
+        if shared.next_maze and
+                vector.distance(player_pos, shared.next_maze.pos) <= MAPGEN_TRIGGER_DISTANCE then
             shared.make_next_maze()
             should_save = true
         end
 
         for key, monster_pos in pairs(shared.monster_positions) do
             if vector.distance(player_pos, monster_pos) <= MAPGEN_TRIGGER_DISTANCE then
+                print("spawning monster")
                 minetest.add_entity(monster_pos, "cascade:monster")
                 shared.monster_positions[key] = nil
                 should_save = true
@@ -88,7 +92,10 @@ minetest.register_globalstep(function()
             end
         end
 
-        if player_pos.y < shared.next_maze.pos.y - 256 then
+        -- `shared.next_maze` can be nil if the world was created with an old
+        -- version of Cascade.
+        local min_y = shared.next_maze and (shared.next_maze.pos.y - 256) or -120
+        if player_pos.y < min_y then
             shared.player_fail(player)
         end
     end

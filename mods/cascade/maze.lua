@@ -240,7 +240,7 @@ local function write_maze(pos_min, pos_max, walls, num_monsters, ref_monster_pos
 
             local world_pos = pos_min + vector.new(
                 (cell.x - 1) * 4 + 2,
-                0.5 + 1.375,
+                0.5 + 22/16,
                 (cell.y - 1) * 4 + 2
             )
             ref_monster_positions[world_pos:to_string()] = world_pos
@@ -252,7 +252,6 @@ local function write_maze(pos_min, pos_max, walls, num_monsters, ref_monster_pos
 end
 
 local function make_maze(pos, size, walls, num_monsters, ref_monster_positions, ref_checkpoints)
-    print("making maze of size " .. tostring(size))
     local pos_min = pos
     local pos_max = pos + vector.new(size * 4, 19, size * 4)
 
@@ -266,16 +265,17 @@ local function make_maze(pos, size, walls, num_monsters, ref_monster_positions, 
 
     table.insert(ref_checkpoints, vector.new(pos_max.x - 2, pos_min.y + 1, pos_max.z - 2))
 
-    return pos + vector.new(size * 4, -15, size * 4)
+    local next_pos = pos + vector.new(size * 4, -15, size * 4)
+    return next_pos
 end
 
-shared.next_maze = nil
-shared.monster_positions = {}
-shared.checkpoints = {}
-
 local function make_initial_maze()
+    shared.monster_positions = {}
+    shared.checkpoints = {}
+
     local pos = make_maze(vector.zero(), 1, WALLS.NO_WALLS, 0,
             shared.monster_positions, shared.checkpoints)
+
     shared.next_maze = {
         pos = pos,
         size = 4,
@@ -283,7 +283,11 @@ local function make_initial_maze()
 end
 
 function shared.make_next_maze()
+    -- This function may only be called if `shared.next_maze` is not nil.
     assert(shared.next_maze)
+    assert(shared.monster_positions)
+    assert(shared.checkpoints)
+
     local data = shared.next_maze
     local num_monsters = math.round((data.size * data.size) / (5 * 5))
 
@@ -294,10 +298,16 @@ function shared.make_next_maze()
 end
 
 function shared.save()
-    assert(shared.next_maze)
+    -- `shared.next_maze` can be nil if the world was created with an old version
+    -- of Cascade.
+    -- assert(shared.next_maze)
+    assert(shared.monster_positions)
+    assert(shared.checkpoints)
+
     shared.storage:set_string("next_maze",         minetest.serialize(shared.next_maze))
     shared.storage:set_string("monster_positions", minetest.serialize(shared.monster_positions))
     shared.storage:set_string("checkpoints",       minetest.serialize(shared.checkpoints))
+    print("saved")
 end
 
 if shared.storage:get_int("generated") ~= 1 then
@@ -307,7 +317,13 @@ if shared.storage:get_int("generated") ~= 1 then
         shared.storage:set_int("generated", 1)
     end)
 else
+    -- `next_maze` can be nil if the world was created with an old version of
+    -- Cascade, but nothing special is needed here because of that. The rest
+    -- of the game can handle `shared.next_maze` being nil.
     shared.next_maze         = minetest.deserialize(shared.storage:get_string("next_maze"))
+    -- `monster_positions` can be nil if the world was created with an old version
+    -- of Cascade. Fall back to an empty table.
     shared.monster_positions = minetest.deserialize(shared.storage:get_string("monster_positions")) or {}
     shared.checkpoints       = minetest.deserialize(shared.storage:get_string("checkpoints"))
+    print("loaded")
 end

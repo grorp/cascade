@@ -3,7 +3,7 @@ local shared = ...
 local Monster = {
     initial_properties = {
         visual = "cube",
-        visual_size = vector.new(2.75, 2.75, 2.75),
+        visual_size = vector.new(44/16, 44/16, 44/16),
         textures = {
             "cascade_monster_top.png",    "cascade_monster_top.png",
             "cascade_monster_side_1.png", "cascade_monster_side_2.png",
@@ -12,7 +12,7 @@ local Monster = {
 
         pointable = false,
         physical = true,
-        collisionbox = {-1.375, -1.375, -1.375, 1.375, 1.375, 1.375},
+        collisionbox = {-22/16, -22/16, -22/16, 22/16, 22/16, 22/16},
     },
 }
 
