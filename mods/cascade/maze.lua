@@ -8,7 +8,7 @@ local stone_sounds = {
     footstep = {name = "default_hard_footstep", gain = 0.2},
 }
 local glass_sounds = {
-    footstep = {name = "default_glass_footstep", gain = 0.3},
+    footstep = {name = "default_glass_footstep", gain = 0.2},
 }
 
 minetest.register_node("cascade:floor", {
@@ -240,7 +240,7 @@ local function write_maze(pos_min, pos_max, walls, num_monsters, ref_monster_pos
 
             local world_pos = pos_min + vector.new(
                 (cell.x - 1) * 4 + 2,
-                0.5 + 1.375,
+                0.5 + 22/16,
                 (cell.y - 1) * 4 + 2
             )
             ref_monster_positions[world_pos:to_string()] = world_pos
@@ -251,56 +251,77 @@ local function write_maze(pos_min, pos_max, walls, num_monsters, ref_monster_pos
     vm:write_to_map()
 end
 
+local function make_maze(pos, size, walls, num_monsters, ref_monster_positions, ref_checkpoints)
+    local pos_min = pos
+    local pos_max = pos + vector.new(size * 4, 19, size * 4)
+
+    write_maze(
+        pos_min,
+        pos_max,
+        walls,
+        num_monsters,
+        ref_monster_positions
+    )
+
+    table.insert(ref_checkpoints, vector.new(pos_max.x - 2, pos_min.y + 1, pos_max.z - 2))
+
+    local next_pos = pos + vector.new(size * 4, -15, size * 4)
+    return next_pos
+end
+
+local function make_initial_maze()
+    shared.monster_positions = {}
+    shared.checkpoints = {}
+
+    local pos = make_maze(vector.zero(), 1, WALLS.NO_WALLS, 0,
+            shared.monster_positions, shared.checkpoints)
+
+    shared.next_maze = {
+        pos = pos,
+        size = 4,
+    }
+end
+
+function shared.make_next_maze()
+    -- This function may only be called if `shared.next_maze` is not nil.
+    assert(shared.next_maze)
+    assert(shared.monster_positions)
+    assert(shared.checkpoints)
+
+    local data = shared.next_maze
+    local num_monsters = math.round((data.size * data.size) / (5 * 5))
+
+    data.pos = make_maze(data.pos, data.size, WALLS.ALL_WALLS, num_monsters,
+            shared.monster_positions, shared.checkpoints)
+
+    data.size = data.size + 2
+end
+
+function shared.save()
+    -- `shared.next_maze` can be nil if the world was created with an old version
+    -- of Cascade.
+    -- assert(shared.next_maze)
+    assert(shared.monster_positions)
+    assert(shared.checkpoints)
+
+    shared.storage:set_string("next_maze",         minetest.serialize(shared.next_maze))
+    shared.storage:set_string("monster_positions", minetest.serialize(shared.monster_positions))
+    shared.storage:set_string("checkpoints",       minetest.serialize(shared.checkpoints))
+end
+
 if shared.storage:get_int("generated") ~= 1 then
     minetest.after(0, function()
-        local monster_positions = {}
-        local checkpoints = {}
-
-        local mazes = {
-            {1, WALLS.NO_WALLS, 0},
-
-            {6, WALLS.ALL_WALLS, 1}, -- one monster for approx. 5x5 cells
-            {9, WALLS.ALL_WALLS, 3},
-            {12, WALLS.ALL_WALLS, 6},
-            {15, WALLS.ALL_WALLS, 9},
-            {15, WALLS.OUTER_WALLS, 9},
-
-            {1, WALLS.NO_WALLS, 0},
-        }
-
-        local pos = vector.zero()
-
-        for _, maze in ipairs(mazes) do
-            local size, walls, num_monsters = unpack(maze)
-
-            local pos_min = pos
-            local pos_max = pos + vector.new(size * 4, 19, size * 4)
-
-            write_maze(
-                pos_min,
-                pos_max,
-                walls,
-                num_monsters,
-                monster_positions
-            )
-            checkpoints[#checkpoints + 1] = vector.new(
-                pos_max.x - 2, pos_min.y + 1, pos_max.z - 2
-            )
-
-            pos = pos + vector.new(size * 4, -15, size * 4)
-        end
-
-        shared.monster_positions = monster_positions
-        shared.checkpoints = checkpoints
-        shared.storage:set_string("monster_positions", minetest.serialize(monster_positions))
-        shared.storage:set_string("checkpoints", minetest.serialize(checkpoints))
+        make_initial_maze()
+        shared.save()
         shared.storage:set_int("generated", 1)
     end)
 else
-    -- The world might have been created with a version of the game where there
-    -- were no monsters yet.
-    shared.monster_positions =
-        minetest.deserialize(shared.storage:get_string("monster_positions")) or {}
-    shared.checkpoints =
-        minetest.deserialize(shared.storage:get_string("checkpoints"))
+    -- `next_maze` can be nil if the world was created with an old version of
+    -- Cascade, but nothing special is needed here because of that. The rest
+    -- of the game can handle `shared.next_maze` being nil.
+    shared.next_maze         = minetest.deserialize(shared.storage:get_string("next_maze"))
+    -- `monster_positions` can be nil if the world was created with an old version
+    -- of Cascade. Fall back to an empty table.
+    shared.monster_positions = minetest.deserialize(shared.storage:get_string("monster_positions")) or {}
+    shared.checkpoints       = minetest.deserialize(shared.storage:get_string("checkpoints"))
 end

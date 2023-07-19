@@ -3,7 +3,7 @@ local shared = ...
 local Monster = {
     initial_properties = {
         visual = "cube",
-        visual_size = vector.new(2.75, 2.75, 2.75),
+        visual_size = vector.new(44/16, 44/16, 44/16),
         textures = {
             "cascade_monster_top.png",    "cascade_monster_top.png",
             "cascade_monster_side_1.png", "cascade_monster_side_2.png",
@@ -12,7 +12,7 @@ local Monster = {
 
         pointable = false,
         physical = true,
-        collisionbox = {-1.375, -1.375, -1.375, 1.375, 1.375, 1.375},
+        collisionbox = {-22/16, -22/16, -22/16, 22/16, 22/16, 22/16},
     },
 }
 
@@ -23,7 +23,7 @@ function Monster:on_activate()
 end
 
 local GRAVITY = vector.new(0, -9.81, 0)
-shared.MONSTER_RADIUS = 50
+local MAX_TARGET_DISTANCE = 50
 local MONSTER_ACCEL = 5
 local MONSTER_DECEL = 5
 
@@ -32,9 +32,7 @@ function Monster:on_step(dtime, moveresult)
 
     local target
 
-    local candidates = minetest.get_objects_inside_radius(
-        self.object:get_pos(), shared.MONSTER_RADIUS
-    )
+    local candidates = minetest.get_objects_inside_radius(self.object:get_pos(), MAX_TARGET_DISTANCE)
     for _, candidate in ipairs(candidates) do
         if candidate:is_player() and (not target or
             vector.distance(self.object:get_pos(), candidate:get_pos()) <
@@ -64,7 +62,7 @@ function Monster:on_step(dtime, moveresult)
 
     for _, collision in ipairs(moveresult.collisions) do
         if collision.type == "object" and collision.object:is_player() then
-            shared.fail(target)
+            shared.player_fail(target)
             break
         end
     end
