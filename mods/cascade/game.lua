@@ -35,6 +35,16 @@ function shared.player_fail(player)
     end
 end
 
+-- Only there not to break old, non-infinite worlds. Not used anymore by new
+-- worlds.
+local function player_win(player)
+    local meta = player:get_meta()
+    if meta:get_int("won") ~= 1 then
+        minetest.sound_play("cascade_win", {to_player = player:get_player_name()})
+        meta:set_int("won", 1)
+    end
+end
+
 local function aabbs_intersect(a, b)
     return
         a.min.x <= b.max.x and
@@ -88,6 +98,13 @@ minetest.register_globalstep(function()
 
             if aabbs_intersect(player_aabb, check_aabb) then
                 player_set_checkpoint(player, check_pos)
+
+                -- `shared.next_maze` will be nil if this is an old, non-infinite
+                -- world.
+                if not shared.next_maze and check_index == #shared.checkpoints then
+                    player_win(player)
+                end
+
                 -- io.write("\a"); io.flush()
             end
         end
