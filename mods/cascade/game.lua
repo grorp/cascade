@@ -109,7 +109,7 @@ minetest.register_globalstep(function()
 
         -- `shared.next_maze` can be nil if the world was created with an old
         -- version of Cascade.
-        local min_y = shared.next_maze and (shared.next_maze.pos.y - 256) or -120
+        local min_y = shared.next_maze and (shared.next_maze.pos.y - 50) or -120
         if player_pos.y < min_y then
             shared.player_fail(player)
         end
