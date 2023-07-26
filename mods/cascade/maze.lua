@@ -97,6 +97,9 @@ local function write_maze(pos_min, pos_max, walls, num_monsters, ref_monster_pos
 
     local vm_data_new = {}
     for index in ipairs(vm_data) do
+        if vm_data[index] == minetest.CONTENT_IGNORE then
+            minetest.log("error", "Found \"ignore\" node while generating maze")
+        end
         vm_data_new[index] = vm_data[index]
     end
 
@@ -255,15 +258,24 @@ local function make_maze(pos, size, walls, num_monsters, ref_monster_positions, 
     local pos_min = pos
     local pos_max = pos + vector.new(size * 4, 19, size * 4)
 
-    write_maze(
-        pos_min,
-        pos_max,
-        walls,
-        num_monsters,
-        ref_monster_positions
-    )
+    -- Without calling `minetest.emerge_area` first, sometimes parts of the mazes
+    -- will be missing.
+    minetest.emerge_area(pos_min, pos_max, function(blockpos, action, calls_remaining)
+        if action == minetest.EMERGE_CANCELLED or action == minetest.EMERGE_ERRORED then
+            minetest.log("error", "\"minetest.emerge_area\" before generating maze failed")
+        end
 
-    table.insert(ref_checkpoints, vector.new(pos_max.x - 2, pos_min.y + 1, pos_max.z - 2))
+        if calls_remaining == 0 then
+            write_maze(
+                pos_min,
+                pos_max,
+                walls,
+                num_monsters,
+                ref_monster_positions
+            )
+            table.insert(ref_checkpoints, vector.new(pos_max.x - 2, pos_min.y + 1, pos_max.z - 2))
+        end
+    end)
 
     local next_pos = pos + vector.new(size * 4, -15, size * 4)
     return next_pos
